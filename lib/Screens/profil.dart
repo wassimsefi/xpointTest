@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xpoint/widget/stepper.dart';
 
 class Profilpage extends StatefulWidget {
   const Profilpage({Key? key}) : super(key: key);
@@ -35,15 +36,11 @@ class _ProfilpageState extends State<Profilpage> {
                     ),
                     Container(
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            "Profil",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 24,
-                                color: Colors.black),
-                          ),
+                          Container(
+                            color: Colors.black,
+                          )
                         ],
                       ),
                     ),

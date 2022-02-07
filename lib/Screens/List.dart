@@ -12,28 +12,26 @@ class Listpage extends StatefulWidget {
 }
 
 class _ListpageState extends State<Listpage> {
-  Future<List<Demande>> getDemand() async {
-    final String apiUrl = "http://localhost:3000/demande";
+  Future<List<DemandeElement>> getDemandes() async {
+    const String apiUrl = "http://192.168.1.16:3000/demande/";
     final Response = await http.get(apiUrl);
 
     if (Response.statusCode == 200) {
-      List<Demande> demandes = demandeFromJson(Response.body);
+      List<dynamic> json = jsonDecode(Response.body);
+
+      List<DemandeElement> demandes =
+          json.map((dynamic item) => DemandeElement.fromJson(item)).toList();
 
       return demandes;
     } else {
-      throw ("Can't get the demande");
+      throw ("Can't get the article");
     }
   }
 
   @override
-  Future<void> initState() async {
-    // TODO: implement initState
+  void initState() {
     super.initState();
-    print('hello');
-
-    List<Demande> demands = await getDemand();
-
-    print('hello 222' + demands[1].title);
+    getDemandes();
   }
 
   List<String> litems = ["1", "2", "3", "4", "5", "6", "7", "8"];
@@ -60,100 +58,81 @@ class _ListpageState extends State<Listpage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
-                    Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          const Text(
-                            "Liste data",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 24,
-                                color: Colors.black),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const <Widget>[
+                        Text(
+                          "Liste data",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 24,
+                              color: Colors.black),
+                        ),
+                      ],
                     ),
 
                     Flexible(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.all(1),
-                        controller: ScrollController(keepScrollOffset: false),
-                        itemCount: litems.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            child: Row(
-                              children: <Widget>[
-                                SizedBox(
-                                  width: 16,
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                      child: FutureBuilder(
+                        future: getDemandes(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List<DemandeElement>> snapshot) {
+                          if (snapshot.hasData) {
+                            List<DemandeElement>? demandes = snapshot.data;
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.all(1),
+                              controller:
+                                  ScrollController(keepScrollOffset: false),
+                              itemCount: demandes!.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 10),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20))),
+                                  child: Row(
                                     children: <Widget>[
-                                      Text(
-                                        "TunCoin " + litems[index],
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.grey[900]),
+                                      const SizedBox(
+                                        width: 16,
+                                      ),
+                                      Expanded(
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              demandes[index].title,
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.grey[900]),
+                                            ),
+                                            Text(
+                                              demandes[index].category,
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.grey[900]),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    Text(
-                                      "1 TNC = \$ 0.1247",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.grey[500]),
-                                    ),
-                                    Text(
-                                      " \$ 0.1247",
-                                      style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.redAccent),
-                                    ),
-                                    RichText(
-                                      text: TextSpan(
-                                        children: [
-                                          WidgetSpan(
-                                            child: Icon(
-                                              Icons.arrow_circle_up_sharp,
-                                              size: 18,
-                                              color: Colors.green,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: " 1.28%",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.green),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                );
+                              },
+                            );
+                          }
+                          return const Center(
+                            child: CircularProgressIndicator(),
                           );
                         },
                       ),

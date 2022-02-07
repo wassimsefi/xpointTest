@@ -4,14 +4,29 @@
 
 import 'dart:convert';
 
-List<Demande> demandeFromJson(String str) =>
-    List<Demande>.from(json.decode(str).map((x) => Demande.fromJson(x)));
+Demande demandeFromJson(String str) => Demande.fromJson(json.decode(str));
 
-String demandeToJson(List<Demande> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String demandeToJson(Demande data) => json.encode(data.toJson());
 
 class Demande {
   Demande({
+    required this.demandes,
+  });
+
+  List<DemandeElement> demandes;
+
+  factory Demande.fromJson(Map<String, dynamic> json) => Demande(
+        demandes: List<DemandeElement>.from(
+            json["demandes"].map((x) => DemandeElement.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "demandes": List<dynamic>.from(demandes.map((x) => x.toJson())),
+      };
+}
+
+class DemandeElement {
+  DemandeElement({
     required this.needTransport,
     required this.title,
     required this.category,
@@ -39,7 +54,7 @@ class Demande {
   DateTime date;
   String comment;
 
-  factory Demande.fromJson(Map<String, dynamic> json) => Demande(
+  factory DemandeElement.fromJson(Map<String, dynamic> json) => DemandeElement(
         needTransport: json["needTransport"],
         title: json["title"],
         category: json["category"],
@@ -55,7 +70,7 @@ class Demande {
       );
 
   Map<String, dynamic> toJson() => {
-        "needTransport": needTransport,
+        "needTransport": needTransport.toString(),
         "title": title,
         "category": category,
         "type": type,
